@@ -50,7 +50,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	// Queued requests.
 	CssLoader.prototype.queue		=	{css: [], js: []},
-	CssLoader.prototype.mapping		=	{};
 	
 	// Reference to the browser's list of stylesheets.
 	CssLoader.prototype.styleSheets	=	doc.styleSheets;
@@ -158,10 +157,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 be executed in this object's context
 	 @private
 	 */
-	CssLoader.prototype.load = function(type, urls, callback, obj, context)
+	CssLoader.prototype.load = function(type, urls, callback, obj, context, mapping)
 	{
 		var self	=	this;
-		
+	
 		var _finish = function(){ self.finish(type); },
 			isCSS	= type === 'css',
 			nodes	= [],
@@ -193,7 +192,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					urls: urls,
 					callback: callback,
 					obj: obj,
-					context: context
+					context: context,
+					mapping: mapping
 				});
 			} else
 			{
@@ -203,7 +203,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						urls: [urls[i]],
 						callback: i === len - 1 ? callback : null, // callback is only added to the last URL
 						obj: obj,
-						context: context
+						context: context,
+						mapping: mapping
 					});
 				}
 			}
@@ -217,15 +218,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		this.head || (this.head = this.doc.head || this.doc.getElementsByTagName('head')[0]);
 		pendingUrls = p.urls.concat();
-
+		
 		for (i = 0, len = pendingUrls.length; i < len; ++i) {
 			url = pendingUrls[i];
 
 			if (isCSS) {
-				node = this.env.gecko ? this.createNode('style', {id: '__css_' + this.mapping[url]}) : this.createNode('link', {
+				node = this.env.gecko ? this.createNode('style', {id: '__css_' + p.mapping[url]}) : this.createNode('link', {
 					href: url,
 					rel: 'stylesheet',
-					id: '__css_' + this.mapping[url]
+					id: '__css_' + p.mapping[url]
 				});
 			} else {
 				node = this.createNode('script', {src: url});
@@ -373,18 +374,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	@static
 	*/
    CssLoader.prototype.css	=	function(urls_m, callback, obj, context)
-   {
-	   this.mapping	=	{};
+   {	   
+	   var mapping	=	{};
 
 	   var urls	=	[];
 
 	   for(var i = 0; i < urls_m.length; i++)
 	   {
 		   urls.push(urls_m[i].url);
-		   this.mapping[urls_m[i].url]	=	urls_m[i].id.match(/([a-z0-9]+)/gi).join('_');
+		   mapping[urls_m[i].url]	=	urls_m[i].id.match(/([a-z0-9]+)/gi).join('_');
 	   }
 
-	   this.load('css', urls, callback, obj, context);
+	   this.load('css', urls, callback, obj, context, mapping);
    };
    
    /**
