@@ -240,7 +240,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				node.onreadystatechange = function() {
 					if (/loaded|complete/.test(node.readyState)) {
 						node.onreadystatechange = null;
-						_finish();
+						// "loaded" readyState fired prematurely in IE 10.
+						// But waiting for a little while can fix this issue.
+						// Please check this out:
+						// https://connect.microsoft.com/IE/feedback/details/729164/\
+						// ie10-dynamic-script-element-fires-loaded-readystate-prematurely
+						env.ie && env.ie[1] == 10 ? setTimeout(_finish, 4) : _finish();
 					}
 				};
 			} else if (isCSS && (this.env.gecko || this.env.webkit)) {
