@@ -3,7 +3,7 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(['pxloader'], function (PxLoader) {
-            return (root.PxLoaderImage = factory(PxLoader));
+            return (root.PxLoaderCss = factory(PxLoader));
         });
     } else if (typeof module === 'object' && module.exports) {
         // Node. Does not work with strict CommonJS, but
@@ -12,7 +12,7 @@
         module.exports = factory(require('pxloader'));
     } else {
         // Browser globals
-        root.PxLoaderImage = factory(root.PxLoader);
+        root.PxLoaderCss = factory(root.PxLoader);
     }
 }(this, function (PxLoader) {
 	function PxLoaderCss(src, tags, priority)
